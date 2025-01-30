@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 const formSchema = z.object({
-  type: z.enum(['TRANSPORT', 'DIET', 'ENERGY']),
+  type: z.enum(['TRANSPORT', 'DIET']),
   category: z.string(),
   value: z.number().min(0),
 });
@@ -42,8 +42,6 @@ export default function LogActivityPage() {
         emissions = values.value * EMISSION_FACTORS.TRANSPORT[values.category as keyof typeof EMISSION_FACTORS.TRANSPORT];
       } else if (values.type === 'DIET') {
         emissions = EMISSION_FACTORS.DIET[values.category as keyof typeof EMISSION_FACTORS.DIET];
-      } else {
-        emissions = values.value * EMISSION_FACTORS.ENERGY.ELECTRICITY;
       }
 
       addActivity({
@@ -55,7 +53,11 @@ export default function LogActivityPage() {
       });
 
       toast.success('Activity logged successfully');
-      form.reset();
+      form.reset({
+        type: 'TRANSPORT',
+        category: 'CAR',
+        value: 0,
+      });
     } catch (error) {
       toast.error('Failed to log activity');
     }
@@ -82,7 +84,6 @@ export default function LogActivityPage() {
                   <TabsList className="w-full">
                     <TabsTrigger className="flex-1" value="TRANSPORT">Transport</TabsTrigger>
                     <TabsTrigger className="flex-1" value="DIET">Diet</TabsTrigger>
-                    <TabsTrigger className="flex-1" value="ENERGY">Energy</TabsTrigger>
                   </TabsList>
                 </Tabs>
               )}
@@ -146,29 +147,16 @@ export default function LogActivityPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    {form.watch('type') === 'TRANSPORT' 
-                      ? 'Distance (miles)' 
-                      : form.watch('type') === 'ENERGY'
-                      ? 'Energy Usage (kWh)'
+                    {form.watch('type') === 'TRANSPORT'
+                      ? 'Distance (miles)'
                       : 'Number of Meals'}
                   </FormLabel>
                   <FormControl>
-                    {form.watch('type') === 'ENERGY' ? (
-                      <Slider
-                        min={0}
-                        max={1000}
-                        step={10}
-                        value={[field.value]}
-                        onValueChange={(value) => field.onChange(value[0])}
-                        className="py-4"
-                      />
-                    ) : (
-                      <Input
-                        type="number"
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    )}
+                    <Input
+                      type="number"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

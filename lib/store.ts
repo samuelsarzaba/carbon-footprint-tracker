@@ -4,7 +4,7 @@ import { EMISSION_FACTORS } from './constants';
 interface Activity {
   id: string;
   date: string;
-  type: 'TRANSPORT' | 'DIET' | 'ENERGY';
+  type: 'TRANSPORT' | 'DIET';
   category: string;
   value: number;
   emissions: number;
@@ -22,8 +22,8 @@ interface UserState {
 
 export const useStore = create<UserState>((set, get) => ({
   activities: [],
-  weeklyCO2: 142,
-  monthlyCO2: 568,
+  weeklyCO2: 0,
+  monthlyCO2: 0,
   goal: 100,
   badges: ['green-commuter', 'plant-power'],
   
